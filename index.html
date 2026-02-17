@@ -149,6 +149,7 @@ button,input,textarea{font-family:inherit;}
   padding:10px 14px;
   display:flex;align-items:flex-end;gap:10px;
   z-index:80;
+  transition:bottom .15s ease;
 }
 /* push msgs content above fixed chat-bar */
 .msgs-pad{height:calc(var(--nav) + max(16px,var(--safe)) + 80px);flex-shrink:0;}
@@ -218,7 +219,7 @@ button,input,textarea{font-family:inherit;}
 /* ══════════════════════════
    KOPILKA
 ══════════════════════════ */
-#s-kopilka .scr{padding:0 16px calc(var(--nav) + max(16px,var(--safe)) + 20px);}
+#s-kopilka .scr{padding:0 16px calc(var(--nav) + max(16px,var(--safe)) + 90px);}
 
 .goal-card{
   background:var(--bg1);border-radius:var(--r);
@@ -241,15 +242,28 @@ button,input,textarea{font-family:inherit;}
 .g-del:active{background:rgba(255,77,109,.28);}
 .g-del svg{width:16px;height:16px;stroke-width:2.5;}
 
-/* LIQUID BAR — SVG waves, no translate */
+/* LIQUID BAR */
 .liq-wrap{position:relative;height:72px;border-radius:16px;background:var(--bg3);overflow:hidden;margin-bottom:14px;}
-.liq-fill{position:absolute;bottom:0;left:0;right:0;height:0%;transition:height 1.3s cubic-bezier(.34,1.2,.64,1);}
-.wave-top{position:absolute;top:-18px;left:0;width:100%;height:20px;pointer-events:none;}
-.wave-top2{position:absolute;top:-12px;left:0;width:100%;height:14px;pointer-events:none;opacity:.5;}
+.liq-fill{
+  position:absolute;bottom:0;left:0;right:0;height:0%;
+  transition:height 1.4s cubic-bezier(.34,1.15,.64,1);
+}
+.liq-fill::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(255,255,255,.18) 0%,rgba(255,255,255,0) 60%);
+  animation:shimmer 2.4s ease-in-out infinite;
+}
+@keyframes shimmer{
+  0%,100%{opacity:.5;transform:translateY(0)}
+  50%{opacity:1;transform:translateY(-3px)}
+}
+.wave-top{position:absolute;top:-18px;left:0;width:200%;height:20px;pointer-events:none;animation:waveMove 3s linear infinite;}
+.wave-top2{position:absolute;top:-12px;left:0;width:200%;height:14px;pointer-events:none;opacity:.5;animation:waveMove 4.5s linear infinite reverse;}
+@keyframes waveMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .liq-pct{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-size:21px;font-weight:900;letter-spacing:-.4px;z-index:2;
-  text-shadow:0 1px 6px rgba(0,0,0,.35);
+  text-shadow:0 1px 6px rgba(0,0,0,.4);
 }
 
 .g-amounts{
@@ -603,7 +617,38 @@ button,input,textarea{font-family:inherit;}
 </div>
 
 <script>
-/* ── NUMBER FORMATTING ── */
+/* ── KEYBOARD HANDLING ── */
+(function(){
+  const bar = document.querySelector('.chat-bar');
+  const nav = document.querySelector('.fnav');
+  const NAV_H = 64 + 16 + 8; // nav + bottom + gap
+
+  function onViewport(){
+    const vv = window.visualViewport;
+    if(!vv) return;
+    // How much the keyboard pushes up
+    const keyboardH = window.innerHeight - vv.height - vv.offsetTop;
+    if(keyboardH > 50){
+      // Keyboard is open — stick bar just above keyboard
+      bar.style.bottom  = keyboardH + 'px';
+      bar.style.backdropFilter = 'blur(20px)';
+      nav.style.opacity = '0';
+      nav.style.pointerEvents = 'none';
+    } else {
+      // Keyboard closed — restore
+      bar.style.bottom  = '';
+      nav.style.opacity = '';
+      nav.style.pointerEvents = '';
+    }
+  }
+
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize', onViewport);
+    window.visualViewport.addEventListener('scroll', onViewport);
+  }
+})();
+
+
 function formatNumInput(input){
   input.addEventListener('input',function(){
     const pos=this.selectionStart;
@@ -1010,21 +1055,11 @@ function goalHTML(g){
 
     <div class="liq-wrap">
       <div class="liq-fill" id="lf-${g.id}" style="height:0%;background:${g.color}">
-        <svg class="wave-top" viewBox="0 0 400 20" preserveAspectRatio="none">
-          <path fill="${g.color}">
-            <animate attributeName="d" dur="3s" repeatCount="indefinite"
-              values="M0,10 C100,0 200,20 300,10 C350,5 380,15 400,10 L400,20 L0,20 Z;
-                      M0,12 C100,4 200,18 300,12 C350,7 380,13 400,12 L400,20 L0,20 Z;
-                      M0,10 C100,0 200,20 300,10 C350,5 380,15 400,10 L400,20 L0,20 Z"/>
-          </path>
+        <svg class="wave-top" viewBox="0 0 800 20" preserveAspectRatio="none">
+          <path fill="${g.color}" d="M0,10 C100,0 200,20 300,10 C400,0 500,20 600,10 C700,0 750,15 800,10 L800,20 L0,20 Z"/>
         </svg>
-        <svg class="wave-top2" viewBox="0 0 400 14" preserveAspectRatio="none">
-          <path fill="${g.color}">
-            <animate attributeName="d" dur="4.5s" repeatCount="indefinite"
-              values="M0,7 C80,0 160,14 240,7 C320,0 360,14 400,7 L400,14 L0,14 Z;
-                      M0,9 C80,2 160,12 240,9 C320,2 360,12 400,9 L400,14 L0,14 Z;
-                      M0,7 C80,0 160,14 240,7 C320,0 360,14 400,7 L400,14 L0,14 Z"/>
-          </path>
+        <svg class="wave-top2" viewBox="0 0 800 14" preserveAspectRatio="none">
+          <path fill="${g.color}" d="M0,7 C80,0 160,14 240,7 C320,0 400,14 480,7 C560,0 640,14 720,7 C760,3 780,11 800,7 L800,14 L0,14 Z"/>
         </svg>
       </div>
       <div class="liq-pct" style="color:${txtCol}">${pct>=100?'🎉':pct.toFixed(1)+'%'}</div>
