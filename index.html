@@ -707,15 +707,18 @@ ${GOAL_EMOJI_MAP}
 Отвечай по-русски, кратко, дружелюбно (1-2 предложения).`;
 
   try{
-    const r = await fetch('https://finance-backend-381v.onrender.com/api/chat', {
+    const controller = new AbortController();
+const timer = setTimeout(() => controller.abort(), 45000);
+
+const r = await fetch('https://finance-backend-381v.onrender.com/api/chat', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ message: t })
+  body: JSON.stringify({ message: t }),
+  signal: controller.signal
 });
 
 const data = await r.json();
-const full = data.text || '';
-;
+clearTimeout(timer);
     chatHistory.push({role:'assistant',content:full});
     hideTyping();
     await processAIResponse(full, t);
