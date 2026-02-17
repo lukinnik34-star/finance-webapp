@@ -1072,20 +1072,29 @@ document.getElementById('depBtn').addEventListener('click', async function(){
   saveG();renderGoals();celebrate(g,msg);
 });
 
-async function genMotiv(g,amount,prev,cmt){
-  const pct=(g.saved/g.target*100).toFixed(1);
-  const diff=((g.saved-prev)/g.target*100).toFixed(1);
-  const prompt=`Пополнил копилку «${g.name}» на ${amount.toLocaleString('ru')} ₽. Теперь ${g.saved.toLocaleString('ru')} из ${g.target.toLocaleString('ru')} ₽ (${pct}%, +${diff}%).${cmt?' Комментарий: '+cmt:''}\nНапиши ОДНО мотивационное сообщение (1-2 предложения). Стиль: дерзкий дружелюбный, используй цифры. Без вступлений.`;
-  try{
+async function genMotiv(g, amount, prev, cmt) {
+  const pct = (g.saved / g.target * 100).toFixed(1);
+  const diff = ((g.saved - prev) / g.target * 100).toFixed(1);
+
+  const prompt = `Пополнил копилку «${g.name}» на ${amount.toLocaleString('ru')} ₽.
+Теперь ${g.saved.toLocaleString('ru')} из ${g.target.toLocaleString('ru')} ₽
+(${pct}%, +${diff}%).${cmt ? ' Комментарий: ' + cmt : ''}
+
+Напиши ОДНО мотивационное сообщение (1-2 предложения). Стиль: дерзкий, дружелюбный. Без вступлений.`;
+
+  try {
     const r = await fetch('https://finance-backend-381v.onrender.com/api/chat', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ message: prompt })
-});
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: prompt })
+    });
 
-const d = await r.json();
-return d.text?.trim() || fallMotiv(g,amount,pct,diff);
+    const d = await r.json();
+    return (d.text || '').trim() || fallMotiv(g, amount, pct, diff);
 
+  } catch (e) {
+    return fallMotiv(g, amount, pct, diff);
+  }
 }
 
 /* ── CELEBRATION ── */
