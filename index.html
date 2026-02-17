@@ -48,35 +48,36 @@ button,input,textarea{font-family:inherit;}
 /* ═══ FLOATING NAV ═══ */
 .fnav{
   position:fixed;
-  bottom:max(12px, env(safe-area-inset-bottom, 0px));
-  left:12px; right:12px;
-  display:flex; align-items:center; justify-content:space-around;
-  padding:5px 4px; border-radius:24px;
-  background:transparent; z-index:200;
-  transition:transform .25s cubic-bezier(.4,0,.2,1), opacity .2s;
+  bottom:max(12px,env(safe-area-inset-bottom,0px));
+  left:12px;right:12px;
+  display:flex;align-items:center;justify-content:space-around;
+  padding:5px 4px;border-radius:24px;
+  background:transparent;z-index:200;
+  transition:transform .25s cubic-bezier(.4,0,.2,1),opacity .2s;
 }
 .fnav::before{
-  content:''; position:absolute; inset:0; border-radius:24px;
+  content:'';
+  position:absolute;inset:0;border-radius:24px;
   background:rgba(18,18,28,.68);
   backdrop-filter:blur(32px) saturate(180%);
   -webkit-backdrop-filter:blur(32px) saturate(180%);
   border:1px solid rgba(255,255,255,.12);
-  box-shadow:0 4px 24px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.07);
-  pointer-events:none; z-index:-1;
+  box-shadow:0 4px 24px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.07);
+  pointer-events:none;z-index:-1;
 }
-.fnav.hidden{ transform:translateY(calc(100% + 20px)); opacity:0; pointer-events:none; }
+.fnav.hidden{transform:translateY(calc(100% + 20px));opacity:0;pointer-events:none;}
 .ni{
-  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
-  height:50px; border-radius:18px; border:none;
-  background:transparent; cursor:pointer; color:rgba(255,255,255,.38);
-  transition:color .15s, background .15s, transform .12s;
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  height:50px;border-radius:18px;border:none;
+  background:transparent;cursor:pointer;color:rgba(255,255,255,.38);
+  transition:color .15s,background .15s,transform .12s;
   -webkit-tap-highlight-color:transparent;
 }
-.ni.on{ background:rgba(124,109,255,.2); color:var(--accent); }
-.ni:active{ transform:scale(.87); }
-.ni svg{ width:22px; height:22px; stroke-width:1.8; transition:transform .15s; }
-.ni.on svg{ transform:scale(1.12); }
-.ni span{ font-size:10px; font-weight:700; letter-spacing:.2px; }
+.ni.on{background:rgba(124,109,255,.2);color:var(--accent);}
+.ni:active{transform:scale(.87);}
+.ni svg{width:22px;height:22px;stroke-width:1.8;transition:transform .15s;}
+.ni.on svg{transform:scale(1.12);}
+.ni span{font-size:10px;font-weight:700;letter-spacing:.2px;}
 
 /* ═══ PAGE HEADER ═══ */
 .ph{padding:52px 20px 12px;flex-shrink:0;}
@@ -313,7 +314,19 @@ button,input,textarea{font-family:inherit;}
 .dr-dt{font-size:11px;color:var(--text3);margin-top:2px;}
 .dr-a{font-size:13px;font-weight:800;color:var(--green);margin-left:auto;flex-shrink:0;}
 
-/* FAB — встроен в заголовок копилки */
+/* FAB — встроен в header копилки */
+.fab{
+  width:44px;height:44px;border-radius:14px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),var(--a2));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(124,109,255,.4);
+  transition:transform .12s,opacity .2s;
+  opacity:0;pointer-events:none;flex-shrink:0;
+  -webkit-tap-highlight-color:transparent;
+}
+.fab.show{opacity:1;pointer-events:all;}
+.fab:active{transform:scale(.9);}
+.fab svg{width:22px;height:22px;stroke:white;stroke-width:2.5;}
 
 /* ══════════════════════════
    MODALS
@@ -516,22 +529,10 @@ button,input,textarea{font-family:inherit;}
 
   <!-- ═══ KOPILKA ═══ -->
   <div class="screen" id="s-kopilka">
-    <div class="ph" style="display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <h1>Копилки 🐷</h1>
-        <p>Цели и накопления</p>
-      </div>
-      <button id="fab" onclick="openGoalModal()" style="
-        width:44px;height:44px;border-radius:14px;border:none;cursor:pointer;
-        background:linear-gradient(135deg,var(--accent),var(--a2));
-        display:flex;align-items:center;justify-content:center;
-        box-shadow:0 4px 16px rgba(124,109,255,.4);
-        flex-shrink:0;
-        -webkit-tap-highlight-color:transparent;
-        transition:transform .12s,opacity .2s;
-        opacity:0;pointer-events:none;
-      ">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+    <div class="ph" style="display:flex;align-items:center;justify-content:space-between;padding-right:20px;">
+      <div><h1>Копилки 🐷</h1><p>Цели и накопления</p></div>
+      <button class="fab" id="fab" onclick="openGoalModal()">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.5"/></svg>
       </button>
     </div>
     <div class="scr" id="goalsEl"></div>
@@ -622,52 +623,41 @@ button,input,textarea{font-family:inherit;}
   const chat = document.getElementById('s-chat');
   if(!chat) return;
 
-  function setKeyboardOpen(open, kbH){
+  function apply(kbH){
+    const open = kbH > 80;
     bar.classList.toggle('keyboard-open', open);
     nav.classList.toggle('hidden', open);
-
+    // Сдвигаем #s-chat вверх на высоту клавиатуры
+    // bottom:auto снимает конфликт с inset:0
     if(open){
-      /* Двигаем весь #s-chat вверх на высоту клавиатуры */
-      chat.style.bottom     = kbH + 'px';
-      chat.style.transition = 'bottom .2s cubic-bezier(.4,0,.2,1)';
-      /* Скроллим к последнему сообщению */
+      chat.style.cssText += ';position:fixed;top:0;left:0;right:0;bottom:'+kbH+'px;transition:bottom .2s cubic-bezier(.4,0,.2,1)';
+    } else {
+      chat.style.cssText = chat.style.cssText
+        .replace(/;?position:[^;]*/,'')
+        .replace(/;?top:[^;]*/,'')
+        .replace(/;?left:[^;]*/,'')
+        .replace(/;?right:[^;]*/,'')
+        .replace(/;?bottom:[^;]*/,'')
+        .replace(/;?transition:[^;]*/,'');
+    }
+    if(open){
       const msgs = document.getElementById('msgs');
       if(msgs && msgs.style.display !== 'none')
         setTimeout(()=>{ msgs.scrollTop = msgs.scrollHeight; }, 80);
-    } else {
-      chat.style.bottom     = '';
-      chat.style.transition = 'bottom .2s cubic-bezier(.4,0,.2,1)';
     }
   }
 
-  /* Способ 1: visualViewport (работает в большинстве браузеров) */
   if(window.visualViewport){
     let raf = null;
-    let prevKbH = 0;
     window.visualViewport.addEventListener('resize', ()=>{
-      if(raf) return;
+      if(raf) cancelAnimationFrame(raf);
       raf = requestAnimationFrame(()=>{
         raf = null;
-        const vv  = window.visualViewport;
-        const kbH = Math.max(0, window.innerHeight - vv.height);
-        if(Math.abs(kbH - prevKbH) < 20) return;
-        prevKbH = kbH;
-        setKeyboardOpen(kbH > 80, kbH);
+        const kbH = Math.max(0, window.innerHeight - window.visualViewport.height);
+        apply(kbH);
       });
     });
-    return;
   }
-
-  /* Способ 2: фокус/blur на input (fallback) */
-  const inp = document.getElementById('userInput');
-  if(!inp) return;
-  inp.addEventListener('focus', ()=>{
-    setTimeout(()=>{
-      const kbH = window.innerHeight - (window.visualViewport?.height || window.innerHeight * 0.6);
-      setKeyboardOpen(true, Math.max(kbH, 250));
-    }, 300);
-  });
-  inp.addEventListener('blur', ()=>{ setKeyboardOpen(false, 0); });
 })();
 
 function formatNumInput(input){
@@ -711,8 +701,7 @@ function go(name, btn){
   document.querySelectorAll('.ni').forEach(b=>b.classList.remove('on'));
   document.getElementById('s-'+name).classList.add('active');
   btn.classList.add('on');
-  const fabEl = document.getElementById('fab');
-  if(fabEl){ fabEl.style.opacity = name==='kopilka'?'1':'0'; fabEl.style.pointerEvents = name==='kopilka'?'all':'none'; }
+  document.getElementById('fab').classList.toggle('show', name==='kopilka');
   if(name==='stats')   renderStats();
   if(name==='history') renderHistory();
   if(name==='kopilka') renderGoals();
@@ -875,7 +864,7 @@ async function processAIResponse(full, originalText){
         document.querySelectorAll('.ni').forEach(b=>b.classList.remove('on'));
         document.getElementById('s-kopilka').classList.add('active');
         document.getElementById('n-kopilka').classList.add('on');
-        document.getElementById('fab').style.opacity='1';document.getElementById('fab').style.pointerEvents='all';
+        document.getElementById('fab').classList.add('show');
         renderGoals();
       },800);
       return;
