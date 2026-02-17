@@ -40,7 +40,7 @@ button,input,textarea{font-family:inherit;}
   display:flex;flex-direction:column;
   opacity:0;pointer-events:none;transform:translateY(10px);
   transition:opacity .22s ease,transform .22s ease;
-  /* НЕТ padding-bottom — контент уходит под nav, blur работает */
+  padding-bottom:0;
 }
 .screen.active{opacity:1;pointer-events:all;transform:translateY(0);}
 #s-chat{padding-bottom:0;}
@@ -52,69 +52,46 @@ button,input,textarea{font-family:inherit;}
 .fnav{
   position:fixed;
   bottom:max(12px, env(safe-area-inset-bottom, 8px));
-  left:12px;
-  right:12px;
+  left:12px; right:12px;
   display:flex;
   align-items:center;
   justify-content:space-around;
   padding:5px 4px;
   border-radius:24px;
-
-  /* Фон НЕ задаём здесь — только через ::before,
-     чтобы backdrop-filter реально размывал контент */
   background:transparent;
   z-index:200;
-  transition:transform .28s cubic-bezier(.4,0,.2,1),
-             opacity   .22s ease;
+  transition:transform .28s cubic-bezier(.4,0,.2,1), opacity .22s ease;
 }
-
-/* Стеклянный pill */
 .fnav::before{
   content:'';
-  position:absolute;
-  inset:0;
+  position:absolute; inset:0;
   border-radius:24px;
-
-  /* Полупрозрачный фон + размытие — именно это и есть «жидкое стекло» */
   background:rgba(18,18,28,.65);
   backdrop-filter:blur(32px) saturate(180%);
   -webkit-backdrop-filter:blur(32px) saturate(180%);
-
-  /* Тонкая обводка и тень как у Telegram */
   border:1px solid rgba(255,255,255,.12);
-  box-shadow:
-    0 6px 28px rgba(0,0,0,.55),
-    inset 0 1px 0 rgba(255,255,255,.07);
-
+  box-shadow:0 6px 28px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.07);
   pointer-events:none;
   z-index:-1;
 }
-
 .fnav.hidden{
   transform:translateY(calc(100% + 24px));
   opacity:0;
   pointer-events:none;
 }
-
-/* Кнопки nav */
 .ni{
   flex:1;
   display:flex;flex-direction:column;align-items:center;gap:3px;
-  height:50px;
-  border-radius:18px;border:none;
-  background:transparent;cursor:pointer;
-  color:rgba(255,255,255,.38);
+  height:50px; border-radius:18px; border:none;
+  background:transparent; cursor:pointer; color:rgba(255,255,255,.38);
   transition:color .15s, background .15s, transform .12s;
   -webkit-tap-highlight-color:transparent;
 }
-.ni.on{
-  background:rgba(124,109,255,.2);
-  color:var(--accent);
-}
-.ni:active{transform:scale(.86);}
-.ni svg{width:22px;height:22px;stroke-width:1.8;transition:transform .15s;}
-.ni.on svg{transform:scale(1.12);}
-.ni span{font-size:10px;font-weight:700;letter-spacing:.2px;}
+.ni.on{ background:rgba(124,109,255,.2); color:var(--accent); }
+.ni:active{ transform:scale(.86); }
+.ni svg{ width:22px;height:22px;stroke-width:1.8;transition:transform .15s; }
+.ni.on svg{ transform:scale(1.12); }
+.ni span{ font-size:10px;font-weight:700;letter-spacing:.2px; }
 
 /* ═══ PAGE HEADER ═══ */
 .ph{padding:52px 20px 12px;flex-shrink:0;}
@@ -178,20 +155,15 @@ button,input,textarea{font-family:inherit;}
 
 .chat-bar{
   flex-shrink:0;
-  /* стеклянный фон — сквозь него видно сообщения */
-  background:rgba(13,13,20,.9);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
+  background:var(--bg1);
   border-top:1px solid rgba(255,255,255,.07);
   padding:10px 14px;
-  /* место для floating pill nav снизу */
   padding-bottom:calc(var(--nav) + 22px);
   display:flex;align-items:flex-end;gap:10px;
-  /* плавная анимация при открытии/закрытии клавиатуры */
-  transition:padding-bottom .22s cubic-bezier(.4,0,.2,1);
+  transition:padding-bottom .2s cubic-bezier(.4,0,.2,1);
 }
 .chat-bar.keyboard-open{
-  padding-bottom:12px;
+  padding-bottom:10px;
 }
 .inp-wrap{flex:1;background:var(--bg2);border-radius:22px;padding:10px 16px;border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;}
 #userInput{width:100%;background:none;border:none;outline:none;resize:none;font-size:15px;color:var(--text);max-height:120px;line-height:1.45;font-weight:500;}
@@ -358,8 +330,8 @@ button,input,textarea{font-family:inherit;}
 
 /* FAB */
 .fab{
-  position:fixed;bottom:calc(var(--nav) + 52px);right:20px;
-  width:52px;height:52px;border-radius:16px;
+  position:fixed;bottom:calc(var(--nav) + 52px);left:20px;
+  width:50px;height:50px;border-radius:16px;
   background:linear-gradient(135deg,var(--accent),var(--a2));
   border:none;cursor:pointer;z-index:89;
   display:flex;align-items:center;justify-content:center;
@@ -660,38 +632,47 @@ button,input,textarea{font-family:inherit;}
 
 /* ── KEYBOARD HANDLING ── */
 (function(){
-  const bar = document.querySelector('.chat-bar');
-  const nav = document.querySelector('.fnav');
-  if(!window.visualViewport) return;
+  const bar      = document.querySelector('.chat-bar');
+  const nav      = document.querySelector('.fnav');
+  const chatScr  = document.getElementById('s-chat');
 
-  let rafId = null;
-  let prevOpen = false;
+  if(!window.visualViewport){ return; }
 
-  function update(){
-    if(rafId) cancelAnimationFrame(rafId);
-    rafId = requestAnimationFrame(()=>{
-      const vv     = window.visualViewport;
-      const kbH    = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      const kbOpen = kbH > 100;
+  let ticking = false;
 
-      if(kbOpen === prevOpen) return;
-      prevOpen = kbOpen;
+  function apply(){
+    const vv    = window.visualViewport;
+    const kbH   = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+    const open  = kbH > 80;
 
-      if(kbOpen){
-        bar.classList.add('keyboard-open');
-        nav.classList.add('hidden');
-        // Скроллим вниз чтобы последнее сообщение было видно
-        const msgs = document.getElementById('msgs');
-        if(msgs) setTimeout(()=>{ msgs.scrollTop = msgs.scrollHeight; }, 50);
-      } else {
-        bar.classList.remove('keyboard-open');
-        nav.classList.remove('hidden');
-      }
-    });
+    /* Ключевой трюк: shrink #s-chat до реальной высоты viewport.
+       Это двигает весь чат вверх — input bar оказывается прямо
+       над клавиатурой, сообщения не перекрываются. */
+    chatScr.style.height    = vv.height + 'px';
+    chatScr.style.top       = vv.offsetTop + 'px';
+    chatScr.style.transition= 'height .2s cubic-bezier(.4,0,.2,1), top .2s cubic-bezier(.4,0,.2,1)';
+
+    bar.classList.toggle('keyboard-open', open);
+    nav.classList.toggle('hidden', open);
+
+    if(open){
+      /* Скроллим к последнему сообщению */
+      const msgs = document.getElementById('msgs');
+      if(msgs && msgs.style.display !== 'none')
+        requestAnimationFrame(()=>{ msgs.scrollTop = msgs.scrollHeight; });
+    }
+    ticking = false;
   }
 
-  window.visualViewport.addEventListener('resize', update);
-  window.visualViewport.addEventListener('scroll', update);
+  function onVVChange(){
+    if(!ticking){ ticking = true; requestAnimationFrame(apply); }
+  }
+
+  window.visualViewport.addEventListener('resize', onVVChange);
+  window.visualViewport.addEventListener('scroll', onVVChange);
+
+  /* Начальная высота */
+  chatScr.style.height = window.visualViewport.height + 'px';
 })();
 
 function formatNumInput(input){
