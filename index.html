@@ -707,7 +707,6 @@ ${GOAL_EMOJI_MAP}
 Отвечай по-русски, кратко, дружелюбно (1-2 предложения).`;
 
   try{
-    const key=new URLSearchParams(location.search).get('key')||'';
     const r = await fetch('https://finance-backend-381v.onrender.com/api/chat', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
@@ -1078,7 +1077,6 @@ async function genMotiv(g,amount,prev,cmt){
   const diff=((g.saved-prev)/g.target*100).toFixed(1);
   const prompt=`Пополнил копилку «${g.name}» на ${amount.toLocaleString('ru')} ₽. Теперь ${g.saved.toLocaleString('ru')} из ${g.target.toLocaleString('ru')} ₽ (${pct}%, +${diff}%).${cmt?' Комментарий: '+cmt:''}\nНапиши ОДНО мотивационное сообщение (1-2 предложения). Стиль: дерзкий дружелюбный, используй цифры. Без вступлений.`;
   try{
-    const key=new URLSearchParams(location.search).get('key')||'';
     const r = await fetch('https://finance-backend-381v.onrender.com/api/chat', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
