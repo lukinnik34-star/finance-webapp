@@ -40,32 +40,31 @@ button,input,textarea{font-family:inherit;}
   display:flex;flex-direction:column;
   opacity:0;pointer-events:none;transform:translateY(10px);
   transition:opacity .22s ease,transform .22s ease;
-  /* padding-bottom убран — контент уходит под стеклянный nav */
 }
 .screen.active{opacity:1;pointer-events:all;transform:translateY(0);}
 #s-chat{padding-bottom:0;}
 .scr{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
 
-/* ═══ FLOATING NAV — стекло как Telegram ═══ */
+/* ═══ FLOATING NAV ═══ */
 .fnav{
   position:fixed;
-  bottom:max(12px, env(safe-area-inset-bottom, 8px));
+  bottom:max(12px, env(safe-area-inset-bottom, 0px));
   left:12px; right:12px;
   display:flex; align-items:center; justify-content:space-around;
   padding:5px 4px; border-radius:24px;
   background:transparent; z-index:200;
-  transition:transform .28s cubic-bezier(.4,0,.2,1), opacity .22s ease;
+  transition:transform .25s cubic-bezier(.4,0,.2,1), opacity .2s;
 }
 .fnav::before{
   content:''; position:absolute; inset:0; border-radius:24px;
-  background:rgba(18,18,28,.65);
+  background:rgba(18,18,28,.68);
   backdrop-filter:blur(32px) saturate(180%);
   -webkit-backdrop-filter:blur(32px) saturate(180%);
   border:1px solid rgba(255,255,255,.12);
-  box-shadow:0 6px 28px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.07);
+  box-shadow:0 4px 24px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.07);
   pointer-events:none; z-index:-1;
 }
-.fnav.hidden{ transform:translateY(calc(100% + 24px)); opacity:0; pointer-events:none; }
+.fnav.hidden{ transform:translateY(calc(100% + 20px)); opacity:0; pointer-events:none; }
 .ni{
   flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
   height:50px; border-radius:18px; border:none;
@@ -74,7 +73,7 @@ button,input,textarea{font-family:inherit;}
   -webkit-tap-highlight-color:transparent;
 }
 .ni.on{ background:rgba(124,109,255,.2); color:var(--accent); }
-.ni:active{ transform:scale(.86); }
+.ni:active{ transform:scale(.87); }
 .ni svg{ width:22px; height:22px; stroke-width:1.8; transition:transform .15s; }
 .ni.on svg{ transform:scale(1.12); }
 .ni span{ font-size:10px; font-weight:700; letter-spacing:.2px; }
@@ -163,7 +162,6 @@ button,input,textarea{font-family:inherit;}
    STATS
 ══════════════════════════ */
 #s-stats .scr{padding:0 16px 96px;}
-
 .sum-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
 .sc{background:var(--bg1);border-radius:var(--r);padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.05);}
 .sc .lb{font-size:11px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
@@ -315,21 +313,7 @@ button,input,textarea{font-family:inherit;}
 .dr-dt{font-size:11px;color:var(--text3);margin-top:2px;}
 .dr-a{font-size:13px;font-weight:800;color:var(--green);margin-left:auto;flex-shrink:0;}
 
-/* FAB */
-.fab{
-  position:fixed;bottom:calc(var(--nav) + 52px);left:20px;
-  width:50px;height:50px;border-radius:16px;
-  background:linear-gradient(135deg,var(--accent),var(--a2));
-  border:none;cursor:pointer;z-index:89;
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 8px 24px rgba(124,109,255,.45);
-  transition:transform .15s,opacity .2s;
-  opacity:0;pointer-events:none;
-  -webkit-tap-highlight-color:transparent;
-}
-.fab.show{opacity:1;pointer-events:all;}
-.fab:active{transform:scale(.9);}
-.fab svg{width:22px;height:22px;stroke:white;stroke-width:2.5;}
+/* FAB — встроен в заголовок копилки */
 
 /* ══════════════════════════
    MODALS
@@ -532,7 +516,24 @@ button,input,textarea{font-family:inherit;}
 
   <!-- ═══ KOPILKA ═══ -->
   <div class="screen" id="s-kopilka">
-    <div class="ph"><h1>Копилки 🐷</h1><p>Цели и накопления</p></div>
+    <div class="ph" style="display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <h1>Копилки 🐷</h1>
+        <p>Цели и накопления</p>
+      </div>
+      <button id="fab" onclick="openGoalModal()" style="
+        width:44px;height:44px;border-radius:14px;border:none;cursor:pointer;
+        background:linear-gradient(135deg,var(--accent),var(--a2));
+        display:flex;align-items:center;justify-content:center;
+        box-shadow:0 4px 16px rgba(124,109,255,.4);
+        flex-shrink:0;
+        -webkit-tap-highlight-color:transparent;
+        transition:transform .12s,opacity .2s;
+        opacity:0;pointer-events:none;
+      ">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+    </div>
     <div class="scr" id="goalsEl"></div>
   </div>
 
@@ -556,10 +557,7 @@ button,input,textarea{font-family:inherit;}
     </button>
   </nav>
 
-  <!-- FAB -->
-  <button class="fab" id="fab" onclick="openGoalModal()">
-    <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14"/></svg>
-  </button>
+
 </div>
 
 <!-- ═══ MODALS ═══ -->
@@ -622,56 +620,54 @@ button,input,textarea{font-family:inherit;}
   const bar  = document.querySelector('.chat-bar');
   const nav  = document.querySelector('.fnav');
   const chat = document.getElementById('s-chat');
-  if(!window.visualViewport || !chat) return;
+  if(!chat) return;
 
-  // Сохраняем исходные стили
-  const origBottom = chat.style.bottom;
-
-  let raf = null;
-  let wasOpen = false;
-
-  function apply(){
-    const vv   = window.visualViewport;
-    const kbH  = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-    const open = kbH > 80;
-
-    if(open === wasOpen){ raf = null; return; }
-    wasOpen = open;
+  function setKeyboardOpen(open, kbH){
+    bar.classList.toggle('keyboard-open', open);
+    nav.classList.toggle('hidden', open);
 
     if(open){
-      /* КЛЮЧ: переопределяем inset:0 (который ставит bottom:0)
-         Устанавливаем позицию вручную чтобы чат занял ровно высоту viewport */
-      chat.style.top      = vv.offsetTop + 'px';
-      chat.style.bottom   = 'auto';
-      chat.style.height   = vv.height + 'px';
-
-      bar.classList.add('keyboard-open');
-      nav.classList.add('hidden');
-
-      // Прокрутить к последнему сообщению
+      /* Двигаем весь #s-chat вверх на высоту клавиатуры */
+      chat.style.bottom     = kbH + 'px';
+      chat.style.transition = 'bottom .2s cubic-bezier(.4,0,.2,1)';
+      /* Скроллим к последнему сообщению */
       const msgs = document.getElementById('msgs');
       if(msgs && msgs.style.display !== 'none')
-        setTimeout(()=>{ msgs.scrollTop = msgs.scrollHeight; }, 60);
-
+        setTimeout(()=>{ msgs.scrollTop = msgs.scrollHeight; }, 80);
     } else {
-      /* Возвращаем исходное состояние */
-      chat.style.top    = '';
-      chat.style.bottom = origBottom || '';
-      chat.style.height = '';
-
-      bar.classList.remove('keyboard-open');
-      nav.classList.remove('hidden');
+      chat.style.bottom     = '';
+      chat.style.transition = 'bottom .2s cubic-bezier(.4,0,.2,1)';
     }
-
-    raf = null;
   }
 
-  function onVV(){
-    if(!raf) raf = requestAnimationFrame(apply);
+  /* Способ 1: visualViewport (работает в большинстве браузеров) */
+  if(window.visualViewport){
+    let raf = null;
+    let prevKbH = 0;
+    window.visualViewport.addEventListener('resize', ()=>{
+      if(raf) return;
+      raf = requestAnimationFrame(()=>{
+        raf = null;
+        const vv  = window.visualViewport;
+        const kbH = Math.max(0, window.innerHeight - vv.height);
+        if(Math.abs(kbH - prevKbH) < 20) return;
+        prevKbH = kbH;
+        setKeyboardOpen(kbH > 80, kbH);
+      });
+    });
+    return;
   }
 
-  window.visualViewport.addEventListener('resize', onVV);
-  window.visualViewport.addEventListener('scroll', onVV);
+  /* Способ 2: фокус/blur на input (fallback) */
+  const inp = document.getElementById('userInput');
+  if(!inp) return;
+  inp.addEventListener('focus', ()=>{
+    setTimeout(()=>{
+      const kbH = window.innerHeight - (window.visualViewport?.height || window.innerHeight * 0.6);
+      setKeyboardOpen(true, Math.max(kbH, 250));
+    }, 300);
+  });
+  inp.addEventListener('blur', ()=>{ setKeyboardOpen(false, 0); });
 })();
 
 function formatNumInput(input){
@@ -715,7 +711,8 @@ function go(name, btn){
   document.querySelectorAll('.ni').forEach(b=>b.classList.remove('on'));
   document.getElementById('s-'+name).classList.add('active');
   btn.classList.add('on');
-  document.getElementById('fab').classList.toggle('show', name==='kopilka');
+  const fabEl = document.getElementById('fab');
+  if(fabEl){ fabEl.style.opacity = name==='kopilka'?'1':'0'; fabEl.style.pointerEvents = name==='kopilka'?'all':'none'; }
   if(name==='stats')   renderStats();
   if(name==='history') renderHistory();
   if(name==='kopilka') renderGoals();
@@ -878,7 +875,7 @@ async function processAIResponse(full, originalText){
         document.querySelectorAll('.ni').forEach(b=>b.classList.remove('on'));
         document.getElementById('s-kopilka').classList.add('active');
         document.getElementById('n-kopilka').classList.add('on');
-        document.getElementById('fab').classList.add('show');
+        document.getElementById('fab').style.opacity='1';document.getElementById('fab').style.pointerEvents='all';
         renderGoals();
       },800);
       return;
