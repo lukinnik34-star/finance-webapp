@@ -40,48 +40,34 @@ button,input,textarea{font-family:inherit;}
   display:flex;flex-direction:column;
   opacity:0;pointer-events:none;transform:translateY(10px);
   transition:opacity .22s ease,transform .22s ease;
-  padding-bottom:0;
+  /* padding-bottom убран — контент уходит под стеклянный nav */
 }
 .screen.active{opacity:1;pointer-events:all;transform:translateY(0);}
 #s-chat{padding-bottom:0;}
 .scr{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
 
-/* ═══════════════════════════════
-   FLOATING NAV — стекло как Telegram
-═══════════════════════════════ */
+/* ═══ FLOATING NAV — стекло как Telegram ═══ */
 .fnav{
   position:fixed;
   bottom:max(12px, env(safe-area-inset-bottom, 8px));
   left:12px; right:12px;
-  display:flex;
-  align-items:center;
-  justify-content:space-around;
-  padding:5px 4px;
-  border-radius:24px;
-  background:transparent;
-  z-index:200;
+  display:flex; align-items:center; justify-content:space-around;
+  padding:5px 4px; border-radius:24px;
+  background:transparent; z-index:200;
   transition:transform .28s cubic-bezier(.4,0,.2,1), opacity .22s ease;
 }
 .fnav::before{
-  content:'';
-  position:absolute; inset:0;
-  border-radius:24px;
+  content:''; position:absolute; inset:0; border-radius:24px;
   background:rgba(18,18,28,.65);
   backdrop-filter:blur(32px) saturate(180%);
   -webkit-backdrop-filter:blur(32px) saturate(180%);
   border:1px solid rgba(255,255,255,.12);
   box-shadow:0 6px 28px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.07);
-  pointer-events:none;
-  z-index:-1;
+  pointer-events:none; z-index:-1;
 }
-.fnav.hidden{
-  transform:translateY(calc(100% + 24px));
-  opacity:0;
-  pointer-events:none;
-}
+.fnav.hidden{ transform:translateY(calc(100% + 24px)); opacity:0; pointer-events:none; }
 .ni{
-  flex:1;
-  display:flex;flex-direction:column;align-items:center;gap:3px;
+  flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
   height:50px; border-radius:18px; border:none;
   background:transparent; cursor:pointer; color:rgba(255,255,255,.38);
   transition:color .15s, background .15s, transform .12s;
@@ -89,9 +75,9 @@ button,input,textarea{font-family:inherit;}
 }
 .ni.on{ background:rgba(124,109,255,.2); color:var(--accent); }
 .ni:active{ transform:scale(.86); }
-.ni svg{ width:22px;height:22px;stroke-width:1.8;transition:transform .15s; }
+.ni svg{ width:22px; height:22px; stroke-width:1.8; transition:transform .15s; }
 .ni.on svg{ transform:scale(1.12); }
-.ni span{ font-size:10px;font-weight:700;letter-spacing:.2px; }
+.ni span{ font-size:10px; font-weight:700; letter-spacing:.2px; }
 
 /* ═══ PAGE HEADER ═══ */
 .ph{padding:52px 20px 12px;flex-shrink:0;}
@@ -177,6 +163,7 @@ button,input,textarea{font-family:inherit;}
    STATS
 ══════════════════════════ */
 #s-stats .scr{padding:0 16px 96px;}
+
 .sum-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
 .sc{background:var(--bg1);border-radius:var(--r);padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.05);}
 .sc .lb{font-size:11px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
@@ -632,47 +619,59 @@ button,input,textarea{font-family:inherit;}
 
 /* ── KEYBOARD HANDLING ── */
 (function(){
-  const bar      = document.querySelector('.chat-bar');
-  const nav      = document.querySelector('.fnav');
-  const chatScr  = document.getElementById('s-chat');
+  const bar  = document.querySelector('.chat-bar');
+  const nav  = document.querySelector('.fnav');
+  const chat = document.getElementById('s-chat');
+  if(!window.visualViewport || !chat) return;
 
-  if(!window.visualViewport){ return; }
+  // Сохраняем исходные стили
+  const origBottom = chat.style.bottom;
 
-  let ticking = false;
+  let raf = null;
+  let wasOpen = false;
 
   function apply(){
-    const vv    = window.visualViewport;
-    const kbH   = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-    const open  = kbH > 80;
+    const vv   = window.visualViewport;
+    const kbH  = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+    const open = kbH > 80;
 
-    /* Ключевой трюк: shrink #s-chat до реальной высоты viewport.
-       Это двигает весь чат вверх — input bar оказывается прямо
-       над клавиатурой, сообщения не перекрываются. */
-    chatScr.style.height    = vv.height + 'px';
-    chatScr.style.top       = vv.offsetTop + 'px';
-    chatScr.style.transition= 'height .2s cubic-bezier(.4,0,.2,1), top .2s cubic-bezier(.4,0,.2,1)';
-
-    bar.classList.toggle('keyboard-open', open);
-    nav.classList.toggle('hidden', open);
+    if(open === wasOpen){ raf = null; return; }
+    wasOpen = open;
 
     if(open){
-      /* Скроллим к последнему сообщению */
+      /* КЛЮЧ: переопределяем inset:0 (который ставит bottom:0)
+         Устанавливаем позицию вручную чтобы чат занял ровно высоту viewport */
+      chat.style.top      = vv.offsetTop + 'px';
+      chat.style.bottom   = 'auto';
+      chat.style.height   = vv.height + 'px';
+
+      bar.classList.add('keyboard-open');
+      nav.classList.add('hidden');
+
+      // Прокрутить к последнему сообщению
       const msgs = document.getElementById('msgs');
       if(msgs && msgs.style.display !== 'none')
-        requestAnimationFrame(()=>{ msgs.scrollTop = msgs.scrollHeight; });
+        setTimeout(()=>{ msgs.scrollTop = msgs.scrollHeight; }, 60);
+
+    } else {
+      /* Возвращаем исходное состояние */
+      chat.style.top    = '';
+      chat.style.bottom = origBottom || '';
+      chat.style.height = '';
+
+      bar.classList.remove('keyboard-open');
+      nav.classList.remove('hidden');
     }
-    ticking = false;
+
+    raf = null;
   }
 
-  function onVVChange(){
-    if(!ticking){ ticking = true; requestAnimationFrame(apply); }
+  function onVV(){
+    if(!raf) raf = requestAnimationFrame(apply);
   }
 
-  window.visualViewport.addEventListener('resize', onVVChange);
-  window.visualViewport.addEventListener('scroll', onVVChange);
-
-  /* Начальная высота */
-  chatScr.style.height = window.visualViewport.height + 'px';
+  window.visualViewport.addEventListener('resize', onVV);
+  window.visualViewport.addEventListener('scroll', onVV);
 })();
 
 function formatNumInput(input){
