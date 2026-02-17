@@ -708,13 +708,15 @@ ${GOAL_EMOJI_MAP}
 
   try{
     const key=new URLSearchParams(location.search).get('key')||'';
-    const r=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-ipc':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,system:sys,messages:chatHistory})
-    });
-    const data=await r.json();
-    const full=data.content?.[0]?.text||'';
+    const r = await fetch('https://finance-backend-381v.onrender.com/api/chat', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ message: t })
+});
+
+const data = await r.json();
+const full = data.text || '';
+;
     chatHistory.push({role:'assistant',content:full});
     hideTyping();
     await processAIResponse(full, t);
@@ -1077,16 +1079,15 @@ async function genMotiv(g,amount,prev,cmt){
   const prompt=`Пополнил копилку «${g.name}» на ${amount.toLocaleString('ru')} ₽. Теперь ${g.saved.toLocaleString('ru')} из ${g.target.toLocaleString('ru')} ₽ (${pct}%, +${diff}%).${cmt?' Комментарий: '+cmt:''}\nНапиши ОДНО мотивационное сообщение (1-2 предложения). Стиль: дерзкий дружелюбный, используй цифры. Без вступлений.`;
   try{
     const key=new URLSearchParams(location.search).get('key')||'';
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-ipc':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:100,messages:[{role:'user',content:prompt}]})});
-    const d=await r.json();
-    return d.content?.[0]?.text?.trim()||fallMotiv(g,amount,pct,diff);
-  }catch(e){return fallMotiv(g,amount,pct,diff);}
-}
-function fallMotiv(g,amount,pct,diff){
-  if(+pct>=100)return`🎉 ЦЕЛЬ ДОСТИГНУТА! «${g.name}» покорена! Ты это сделал!`;
-  if(+pct>=75)return`Финальная прямая! ${pct}% — «${g.name}» почти твоя! 🏁`;
-  const m=[`Юхуу! +${diff}% за раз — это огонь! ${pct}% к «${g.name}» 🔥`,`${amount.toLocaleString('ru')} ₽ в копилку! ${pct}% пути пройдено 💪`,`Красава! ${pct}% — «${g.name}» всё ближе 🚀`];
-  return m[~~(Math.random()*m.length)];
+    const r = await fetch('https://finance-backend-381v.onrender.com/api/chat', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ message: prompt })
+});
+
+const d = await r.json();
+return d.text?.trim() || fallMotiv(g,amount,pct,diff);
+
 }
 
 /* ── CELEBRATION ── */
