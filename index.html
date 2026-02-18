@@ -559,30 +559,40 @@ button,input,textarea{font-family:inherit;}
   position:absolute;
   top:0;
   bottom:0;
-  width:60px;
+  width:70px;
   display:flex;
   align-items:center;
   justify-content:center;
   z-index:1;
+  transition:transform .15s ease;
 }
 .swipe-actions-left{
   left:0;
-  background:rgba(124,109,255,.95);
+  background:linear-gradient(90deg, rgba(124,109,255,.95), rgba(124,109,255,1));
+  box-shadow:inset -2px 0 8px rgba(0,0,0,.2);
 }
 .swipe-actions-right{
   right:0;
-  background:rgba(255,77,109,.95);
+  background:linear-gradient(-90deg, rgba(255,77,109,.95), rgba(255,77,109,1));
+  box-shadow:inset 2px 0 8px rgba(0,0,0,.2);
 }
 .swipe-action-icon{
-  width:22px;
-  height:22px;
+  width:26px;
+  height:26px;
   stroke:white;
   stroke-width:2.5;
   fill:none;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+}
+.swipe-actions-left:active .swipe-action-icon,
+.swipe-actions-right:active .swipe-action-icon{
+  transform:scale(1.2);
 }
 .hi-wrapper{
   position:relative;
   border-bottom:1px solid rgba(255,255,255,.04);
+  overflow:hidden;
 }
 .hi-wrapper:last-child{border-bottom:none;}
 .swipeable{
@@ -1950,12 +1960,15 @@ renderHistory = function(){
   let startX = 0;
   let startY = 0;
   let currentX = 0;
-  let swipeEl = null; // This will be the .swipeable element
-  let wrapper = null; // This will be the .hi-wrapper
+  let swipeEl = null;
+  let wrapper = null;
   let isSwiping = false;
-  let hasMoved = false;
+  let hasStartedSwipe = false;
+  let actionExecuted = false;
 
   const histEl = document.getElementById('histEl');
+  const SWIPE_THRESHOLD = 70; // Distance needed to trigger action
+  const SWIPE_START_THRESHOLD = 15; // Distance to start swipe
 
   histEl.addEventListener('touchstart', e => {
     const target = e.target.closest('.hi-wrapper');
@@ -1968,108 +1981,97 @@ renderHistory = function(){
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
     currentX = startX;
-    hasMoved = false;
+    hasStartedSwipe = false;
     isSwiping = false;
+    actionExecuted = false;
   }, {passive: true});
 
   histEl.addEventListener('touchmove', e => {
-    if(!swipeEl) return;
+    if(!swipeEl || actionExecuted) return;
     
     currentX = e.touches[0].clientX;
     const diffX = currentX - startX;
     const diffY = e.touches[0].clientY - startY;
     
-    // Threshold - start swiping only if moved horizontally more than 10px
-    if(!isSwiping && Math.abs(diffX) > 10 && Math.abs(diffX) > Math.abs(diffY)) {
+    // Start swiping only if horizontal movement is significant
+    if(!hasStartedSwipe && Math.abs(diffX) > SWIPE_START_THRESHOLD && Math.abs(diffX) > Math.abs(diffY)) {
+      hasStartedSwipe = true;
       isSwiping = true;
-      hasMoved = true;
       swipeEl.classList.add('swiping');
     }
     
     if(!isSwiping) return;
     
-    // Limit swipe distance to button width
-    const maxSwipe = 60;
+    // Limit swipe distance
+    const maxSwipe = 100;
     const clampedDiff = Math.max(-maxSwipe, Math.min(maxSwipe, diffX));
     swipeEl.style.transform = `translateX(${clampedDiff}px)`;
+    
+    // Execute action when threshold reached
+    if(!actionExecuted) {
+      if(diffX < -SWIPE_THRESHOLD) {
+        // Delete action
+        actionExecuted = true;
+        executeDelete();
+      } else if(diffX > SWIPE_THRESHOLD) {
+        // Edit action
+        actionExecuted = true;
+        executeEdit();
+      }
+    }
   }, {passive: true});
 
   histEl.addEventListener('touchend', e => {
     if(!swipeEl || !wrapper) return;
     
-    const diff = currentX - startX;
-    
     if(swipeEl) swipeEl.classList.remove('swiping');
     
-    // If didn't move much, it's a click - check if clicked on action button
-    if(!hasMoved || Math.abs(diff) < 10) {
-      const target = e.target.closest('.swipe-actions-left, .swipe-actions-right');
-      if(target) {
-        const txId = +wrapper.dataset.txid;
-        if(target.classList.contains('swipe-actions-left')) {
-          // Edit
-          swipeEl.style.transform = '';
-          openEditTx(txId);
-        } else {
-          // Delete
-          swipeEl.style.transform = 'translateX(-100%)';
-          swipeEl.style.opacity = '0';
-          setTimeout(() => {
-            txs = txs.filter(t => t.id !== txId);
-            save();
-            renderHistory();
-            if(tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-          }, 250);
-        }
-      } else {
-        swipeEl.style.transform = '';
-      }
-    }
-    // Swiped significantly
-    else if(diff < -50) {
-      // Keep swiped left (showing delete button)
-      swipeEl.style.transform = 'translateX(-60px)';
-    } else if(diff > 50) {
-      // Keep swiped right (showing edit button)
-      swipeEl.style.transform = 'translateX(60px)';
-    } else {
-      // Reset
+    // If action wasn't executed, reset position
+    if(!actionExecuted) {
+      swipeEl.style.transition = 'transform .2s cubic-bezier(.4,0,.2,1)';
       swipeEl.style.transform = '';
+      setTimeout(() => { if(swipeEl) swipeEl.style.transition = ''; }, 200);
     }
     
     isSwiping = false;
-    hasMoved = false;
+    hasStartedSwipe = false;
     swipeEl = null;
     wrapper = null;
   });
-  
-  // Click on visible buttons
-  histEl.addEventListener('click', e => {
-    const btn = e.target.closest('.swipe-actions-left, .swipe-actions-right');
-    if(!btn) return;
+
+  function executeDelete() {
+    if(!wrapper || !swipeEl) return;
+    const txId = +wrapper.dataset.txid;
     
-    const item = btn.closest('.hi-wrapper');
-    const txId = +item.dataset.txid;
-    const swipeable = item.querySelector('.swipeable');
+    if(tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
     
-    if(btn.classList.contains('swipe-actions-left')) {
-      // Edit
-      if(swipeable) swipeable.style.transform = '';
+    // Animate out
+    swipeEl.style.transition = 'transform .3s cubic-bezier(.4,0,.2,1), opacity .3s';
+    swipeEl.style.transform = 'translateX(-100%)';
+    swipeEl.style.opacity = '0';
+    
+    setTimeout(() => {
+      txs = txs.filter(t => t.id !== txId);
+      save();
+      renderHistory();
+    }, 300);
+  }
+
+  function executeEdit() {
+    if(!wrapper || !swipeEl) return;
+    const txId = +wrapper.dataset.txid;
+    
+    if(tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+    
+    // Animate back
+    swipeEl.style.transition = 'transform .2s cubic-bezier(.4,0,.2,1)';
+    swipeEl.style.transform = '';
+    
+    setTimeout(() => {
       openEditTx(txId);
-    } else {
-      // Delete
-      if(swipeable) {
-        swipeable.style.transform = 'translateX(-100%)';
-        swipeable.style.opacity = '0';
-      }
-      setTimeout(() => {
-        txs = txs.filter(t => t.id !== txId);
-        save();
-        renderHistory();
-        if(tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-      }, 250);
-    }
-  });
+      if(swipeEl) swipeEl.style.transition = '';
+    }, 200);
+  }
 })();
 
 // Haptic feedback for buttons
