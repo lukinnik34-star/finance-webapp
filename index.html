@@ -40,6 +40,7 @@ button,input,textarea{font-family:inherit;}
   display:flex;flex-direction:column;
   opacity:0;pointer-events:none;transform:translateY(10px);
   transition:opacity .22s ease,transform .22s ease;
+  padding-bottom:var(--nav);
 }
 .screen.active{opacity:1;pointer-events:all;transform:translateY(0);}
 #s-chat{padding-bottom:0;}
@@ -48,35 +49,46 @@ button,input,textarea{font-family:inherit;}
 /* ═══ FLOATING NAV ═══ */
 .fnav{
   position:fixed;
-  bottom:max(12px,env(safe-area-inset-bottom,0px));
-  left:12px;right:12px;
-  display:flex;align-items:center;justify-content:space-around;
-  padding:5px 4px;border-radius:24px;
-  background:transparent;z-index:200;
-  transition:transform .25s cubic-bezier(.4,0,.2,1),opacity .2s;
+  bottom:0; left:0; right:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  padding:8px 12px max(8px, var(--safe));
+
+  /* truly transparent — no solid bg */
+  background:transparent;
+  border-top:none;
+
+  z-index:90;
+  transition:transform .22s ease, opacity .22s ease;
 }
+/* glass effect via pseudo-element so content stays sharp */
 .fnav::before{
   content:'';
-  position:absolute;inset:0;border-radius:24px;
-  background:rgba(18,18,28,.68);
-  backdrop-filter:blur(32px) saturate(180%);
-  -webkit-backdrop-filter:blur(32px) saturate(180%);
-  border:1px solid rgba(255,255,255,.12);
-  box-shadow:0 4px 24px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.07);
-  pointer-events:none;z-index:-1;
+  position:absolute;inset:0;
+  background:rgba(10,10,18,.6);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  border-top:1px solid rgba(255,255,255,.1);
+  pointer-events:none;
+  z-index:-1;
 }
-.fnav.hidden{transform:translateY(calc(100% + 20px));opacity:0;pointer-events:none;}
+.fnav.hidden{
+  transform:translateY(100%);
+  opacity:0;
+  pointer-events:none;
+}
 .ni{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
-  height:50px;border-radius:18px;border:none;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  width:80px;height:50px;border-radius:14px;border:none;
   background:transparent;cursor:pointer;color:rgba(255,255,255,.38);
-  transition:color .15s,background .15s,transform .12s;
+  transition:color .18s,background .18s;
   -webkit-tap-highlight-color:transparent;
 }
-.ni.on{background:rgba(124,109,255,.2);color:var(--accent);}
-.ni:active{transform:scale(.87);}
-.ni svg{width:22px;height:22px;stroke-width:1.8;transition:transform .15s;}
-.ni.on svg{transform:scale(1.12);}
+.ni.on{background:rgba(124,109,255,.18);color:var(--accent);}
+.ni svg{width:22px;height:22px;stroke-width:1.8;transition:transform .18s;}
+.ni.on svg{transform:scale(1.1);}
 .ni span{font-size:10px;font-weight:700;letter-spacing:.2px;}
 
 /* ═══ PAGE HEADER ═══ */
@@ -141,17 +153,27 @@ button,input,textarea{font-family:inherit;}
 
 .chat-bar{
   flex-shrink:0;
-  background:var(--bg1);
-  border-top:1px solid rgba(255,255,255,.07);
+  background:transparent;
+  border-top:none;
   padding:10px 14px;
-  padding-bottom:calc(var(--nav) + 22px);
+  padding-bottom:calc(var(--nav) + 10px);
   display:flex;align-items:flex-end;gap:10px;
-  transition:padding-bottom .2s cubic-bezier(.4,0,.2,1);
+  transition:padding-bottom .1s;
 }
 .chat-bar.keyboard-open{
   padding-bottom:10px;
 }
-.inp-wrap{flex:1;background:var(--bg2);border-radius:22px;padding:10px 16px;border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;}
+.inp-wrap{
+  flex:1;
+  background:rgba(255,255,255,.02);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-radius:22px;
+  padding:10px 16px;
+  border:none;
+  display:flex;
+  align-items:center;
+}
 #userInput{width:100%;background:none;border:none;outline:none;resize:none;font-size:15px;color:var(--text);max-height:120px;line-height:1.45;font-weight:500;}
 #userInput::placeholder{color:var(--text3);}
 .sbtn{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--a2));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 16px rgba(124,109,255,.4);transition:transform .12s,opacity .2s;}
@@ -162,7 +184,7 @@ button,input,textarea{font-family:inherit;}
 /* ══════════════════════════
    STATS
 ══════════════════════════ */
-#s-stats .scr{padding:0 16px 96px;}
+#s-stats .scr{padding:0 16px 16px;}
 .sum-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;}
 .sc{background:var(--bg1);border-radius:var(--r);padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.05);}
 .sc .lb{font-size:11px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
@@ -182,7 +204,7 @@ button,input,textarea{font-family:inherit;}
 /* ══════════════════════════
    HISTORY + FILTERS
 ══════════════════════════ */
-#s-history .scr{padding:0 16px 96px;}
+#s-history .scr{padding:0 16px 16px;}
 
 .filter-row{
   display:flex;gap:6px;overflow-x:auto;padding:12px 0 4px;
@@ -217,7 +239,7 @@ button,input,textarea{font-family:inherit;}
 /* ══════════════════════════
    KOPILKA
 ══════════════════════════ */
-#s-kopilka .scr{padding:0 16px 110px;}
+#s-kopilka .scr{padding:0 16px 100px;}
 
 .goal-card{
   background:var(--bg1);border-radius:var(--r);
@@ -314,14 +336,16 @@ button,input,textarea{font-family:inherit;}
 .dr-dt{font-size:11px;color:var(--text3);margin-top:2px;}
 .dr-a{font-size:13px;font-weight:800;color:var(--green);margin-left:auto;flex-shrink:0;}
 
-/* FAB — встроен в header копилки */
+/* FAB */
 .fab{
-  width:44px;height:44px;border-radius:14px;border:none;cursor:pointer;
+  position:fixed;bottom:calc(var(--nav) + 18px);right:20px;
+  width:52px;height:52px;border-radius:16px;
   background:linear-gradient(135deg,var(--accent),var(--a2));
+  border:none;cursor:pointer;z-index:89;
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 4px 16px rgba(124,109,255,.4);
-  transition:transform .12s,opacity .2s;
-  opacity:0;pointer-events:none;flex-shrink:0;
+  box-shadow:0 8px 24px rgba(124,109,255,.45);
+  transition:transform .15s,opacity .2s;
+  opacity:0;pointer-events:none;
   -webkit-tap-highlight-color:transparent;
 }
 .fab.show{opacity:1;pointer-events:all;}
@@ -529,12 +553,7 @@ button,input,textarea{font-family:inherit;}
 
   <!-- ═══ KOPILKA ═══ -->
   <div class="screen" id="s-kopilka">
-    <div class="ph" style="display:flex;align-items:center;justify-content:space-between;padding-right:20px;">
-      <div><h1>Копилки 🐷</h1><p>Цели и накопления</p></div>
-      <button class="fab" id="fab" onclick="openGoalModal()">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.5"/></svg>
-      </button>
-    </div>
+    <div class="ph"><h1>Копилки 🐷</h1><p>Цели и накопления</p></div>
     <div class="scr" id="goalsEl"></div>
   </div>
 
@@ -558,7 +577,10 @@ button,input,textarea{font-family:inherit;}
     </button>
   </nav>
 
-
+  <!-- FAB -->
+  <button class="fab" id="fab" onclick="openGoalModal()">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
 </div>
 
 <!-- ═══ MODALS ═══ -->
@@ -618,46 +640,22 @@ button,input,textarea{font-family:inherit;}
 
 /* ── KEYBOARD HANDLING ── */
 (function(){
-  const bar  = document.querySelector('.chat-bar');
-  const nav  = document.querySelector('.fnav');
-  const chat = document.getElementById('s-chat');
-  if(!chat) return;
-
-  function apply(kbH){
-    const open = kbH > 80;
-    bar.classList.toggle('keyboard-open', open);
-    nav.classList.toggle('hidden', open);
-    // Сдвигаем #s-chat вверх на высоту клавиатуры
-    // bottom:auto снимает конфликт с inset:0
-    if(open){
-      chat.style.cssText += ';position:fixed;top:0;left:0;right:0;bottom:'+kbH+'px;transition:bottom .2s cubic-bezier(.4,0,.2,1)';
-    } else {
-      chat.style.cssText = chat.style.cssText
-        .replace(/;?position:[^;]*/,'')
-        .replace(/;?top:[^;]*/,'')
-        .replace(/;?left:[^;]*/,'')
-        .replace(/;?right:[^;]*/,'')
-        .replace(/;?bottom:[^;]*/,'')
-        .replace(/;?transition:[^;]*/,'');
-    }
-    if(open){
-      const msgs = document.getElementById('msgs');
-      if(msgs && msgs.style.display !== 'none')
-        setTimeout(()=>{ msgs.scrollTop = msgs.scrollHeight; }, 80);
-    }
-  }
-
-  if(window.visualViewport){
-    let raf = null;
-    window.visualViewport.addEventListener('resize', ()=>{
-      if(raf) cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(()=>{
-        raf = null;
-        const kbH = Math.max(0, window.innerHeight - window.visualViewport.height);
-        apply(kbH);
-      });
+  const bar = document.querySelector('.chat-bar');
+  const nav = document.querySelector('.fnav');
+  if(!window.visualViewport) return;
+  let rafId = null;
+  function onResize(){
+    if(rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(()=>{
+      const vv = window.visualViewport;
+      const kbH = window.innerHeight - vv.height - vv.offsetTop;
+      const kbOpen = kbH > 80;
+      bar.classList.toggle('keyboard-open', kbOpen);
+      nav.classList.toggle('hidden', kbOpen);
     });
   }
+  window.visualViewport.addEventListener('resize', onResize);
+  window.visualViewport.addEventListener('scroll', onResize);
 })();
 
 function formatNumInput(input){
