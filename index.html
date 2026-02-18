@@ -227,7 +227,10 @@ button,input,textarea{font-family:inherit;}
 
 .day-g{margin-bottom:12px;}
 .day-lb{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:8px 2px 6px;}
-.day-items{background:var(--bg1);border-radius:var(--r);overflow:hidden;border:1px solid rgba(255,255,255,.05);}
+.day-items{background:var(--bg1);border-radius:var(--r);border:1px solid rgba(255,255,255,.05);}
+.hi-wrapper:first-child .swipeable{border-radius:var(--r) var(--r) 0 0;}
+.hi-wrapper:last-child .swipeable{border-radius:0 0 var(--r) var(--r);}
+.hi-wrapper:first-child:last-child .swipeable{border-radius:var(--r);}
 .hi{display:flex;align-items:center;gap:12px;padding:13px 15px;}
 .hi-ico{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .hi-ico.expense{background:rgba(255,77,109,.1);}
@@ -551,6 +554,7 @@ button,input,textarea{font-family:inherit;}
 /* ═══ SWIPE ACTIONS ═══ */
 .swipe-container{position:relative;overflow:hidden;}
 .swipe-actions-left,
+.swipe-actions-left,
 .swipe-actions-right{
   position:absolute;
   top:0;
@@ -560,11 +564,22 @@ button,input,textarea{font-family:inherit;}
   align-items:center;
   justify-content:center;
   z-index:1;
-  opacity:.85;
 }
-.swipe-actions-left{left:0;background:rgba(124,109,255,.9);border-radius:var(--r);}
-.swipe-actions-right{right:0;background:rgba(255,77,109,.9);border-radius:var(--r);}
-.swipe-action-icon{width:20px;height:20px;stroke:white;stroke-width:2.5;}
+.swipe-actions-left{
+  left:0;
+  background:rgba(124,109,255,.95);
+}
+.swipe-actions-right{
+  right:0;
+  background:rgba(255,77,109,.95);
+}
+.swipe-action-icon{
+  width:22px;
+  height:22px;
+  stroke:white;
+  stroke-width:2.5;
+  fill:none;
+}
 .hi-wrapper{
   position:relative;
   border-bottom:1px solid rgba(255,255,255,.04);
