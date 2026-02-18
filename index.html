@@ -556,15 +556,16 @@ button,input,textarea{font-family:inherit;}
   position:absolute;
   top:0;
   bottom:0;
-  width:80px;
+  width:60px;
   display:flex;
   align-items:center;
   justify-content:center;
   z-index:1;
+  opacity:.85;
 }
-.swipe-actions-left{left:0;background:var(--accent);}
-.swipe-actions-right{right:0;background:var(--red);}
-.swipe-action-icon{width:24px;height:24px;stroke:white;stroke-width:2.5;}
+.swipe-actions-left{left:0;background:rgba(124,109,255,.9);}
+.swipe-actions-right{right:0;background:rgba(255,77,109,.9);}
+.swipe-action-icon{width:20px;height:20px;stroke:white;stroke-width:2.5;}
 .swipeable{
   position:relative;
   z-index:2;
@@ -650,7 +651,11 @@ button,input,textarea{font-family:inherit;}
   <div class="screen" id="s-history">
     <div class="ph" style="display:flex;align-items:center;justify-content:space-between;">
       <div><h1>История</h1></div>
-      <button onclick="openM('mRecurring')" style="width:44px;height:44px;border-radius:14px;border:none;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;flex-shrink:0;">🔄</button>
+      <button onclick="openM('mRecurring')" style="width:44px;height:44px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--accent),var(--a2));display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 2px 8px rgba(124,109,255,.3);transition:transform .12s;-webkit-tap-highlight-color:transparent;" onmousedown="this.style.transform='scale(.88)'" onmouseup="this.style.transform='scale(1)'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" style="width:20px;height:20px;stroke-width:2.5;">
+          <path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/>
+        </svg>
+      </button>
     </div>
     <!-- Search bar -->
     <div style="padding:0 16px;flex-shrink:0;margin-bottom:8px;">
@@ -1305,6 +1310,20 @@ function renderStats(){
   if(cats.length)dI=new Chart(document.getElementById('donutChart'),{type:'doughnut',data:{labels:cats.map(c=>c[0]),datasets:[{data:cats.map(c=>c[1]),backgroundColor:PAL,borderWidth:0,hoverOffset:10}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false}}}});
   document.getElementById('catList').innerHTML=cats.map((c,i)=>`<div class="cr"><div class="cdot" style="background:${PAL[i%PAL.length]}"></div><div class="cn">${ICONS[c[0]]||'•'} ${c[0]}</div><div class="ct"><div class="cf" style="width:0%;background:${PAL[i%PAL.length]}" data-w="${(c[1]/mx*100).toFixed(0)}"></div></div><div class="ca">${fmt(c[1])}</div></div>`).join('');
   setTimeout(()=>document.querySelectorAll('.cf').forEach(el=>{el.style.width=el.dataset.w+'%';}),60);
+  
+  // Streak display - only if > 0
+  if(achievements && achievements.streak > 0){
+    const statsCont = document.querySelector('#s-stats .scr > div');
+    let streakEl = statsCont.querySelector('.streak-card');
+    if(!streakEl){
+      streakEl = document.createElement('div');
+      streakEl.className = 'streak-card';
+      streakEl.style.cssText = 'text-align:center;margin-bottom:16px;padding:16px;background:var(--bg2);border-radius:14px;';
+      statsCont.insertBefore(streakEl, statsCont.firstChild);
+    }
+    const days = achievements.streak === 1 ? 'день' : achievements.streak < 5 ? 'дня' : 'дней';
+    streakEl.innerHTML = `<div style="font-size:40px;margin-bottom:6px;">🔥</div><div style="font-size:20px;font-weight:800;letter-spacing:-.4px;">${achievements.streak} ${days} подряд</div><div style="font-size:13px;color:var(--text2);margin-top:4px;">Ты молодец!</div>`;
+  }
 }
 
 /* ── HISTORY ── */
@@ -1981,16 +2000,6 @@ if(tg?.HapticFeedback){
   document.querySelectorAll('button').forEach(btn=>{
     btn.addEventListener('click', ()=> tg.HapticFeedback.impactOccurred('light'));
   });
-}
-
-// Add streak display to stats
-function renderStats(){
-  // ... existing stats code ...
-  // Add streak info
-  const streakEl = document.createElement('div');
-  streakEl.style.cssText = 'text-align:center;margin:16px 0;padding:12px;background:var(--bg2);border-radius:14px;';
-  streakEl.innerHTML = `<div style="font-size:32px;margin-bottom:4px;">🔥</div><div style="font-size:18px;font-weight:800;">${achievements.streak} дней подряд</div><div style="font-size:13px;color:var(--text2);margin-top:2px;">Ты молодец!</div>`;
-  document.querySelector('#s-stats .scr > div').prepend(streakEl);
 }
 </script>
 </body>
