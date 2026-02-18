@@ -153,8 +153,8 @@ button,input,textarea{font-family:inherit;}
 
 .chat-bar{
   flex-shrink:0;
-  background:transparent;
-  border-top:none;
+  background:var(--bg1);
+  border-top:1px solid rgba(255,255,255,.07);
   padding:10px 14px;
   padding-bottom:calc(var(--nav) + 10px);
   display:flex;align-items:flex-end;gap:10px;
@@ -163,17 +163,7 @@ button,input,textarea{font-family:inherit;}
 .chat-bar.keyboard-open{
   padding-bottom:10px;
 }
-.inp-wrap{
-  flex:1;
-  background:rgba(255,255,255,.02);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  border-radius:22px;
-  padding:10px 16px;
-  border:none;
-  display:flex;
-  align-items:center;
-}
+.inp-wrap{flex:1;background:var(--bg2);border-radius:22px;padding:10px 16px;border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;}
 #userInput{width:100%;background:none;border:none;outline:none;resize:none;font-size:15px;color:var(--text);max-height:120px;line-height:1.45;font-weight:500;}
 #userInput::placeholder{color:var(--text3);}
 .sbtn{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--a2));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 16px rgba(124,109,255,.4);transition:transform .12s,opacity .2s;}
@@ -291,9 +281,9 @@ button,input,textarea{font-family:inherit;}
   0%{transform:translateX(-100%)}
   60%,100%{transform:translateX(200%)}
 }
-.wave-top{position:absolute;top:-18px;left:0;width:200%;height:20px;pointer-events:none;animation:waveMove 2.5s linear infinite;}
-.wave-top2{position:absolute;top:-12px;left:0;width:200%;height:14px;pointer-events:none;opacity:.6;animation:waveMove 4s linear infinite reverse;}
-@keyframes waveMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.wave-top{position:absolute;top:-18px;left:0;width:200%;height:20px;pointer-events:none;animation:waveMove 6s linear infinite;will-change:transform;}
+.wave-top2{position:absolute;top:-12px;left:0;width:200%;height:14px;pointer-events:none;opacity:.5;animation:waveMove 8s linear infinite reverse;will-change:transform;}
+@keyframes waveMove{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .liq-pct{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-size:21px;font-weight:900;letter-spacing:-.4px;z-index:4;
@@ -1067,11 +1057,11 @@ function goalHTML(g){
 
     <div class="liq-wrap">
       <div class="liq-fill" id="lf-${g.id}" style="height:0%;background:${g.color}">
-        <svg class="wave-top" viewBox="0 0 800 20" preserveAspectRatio="none">
-          <path fill="${g.color}" d="M0,10 C100,0 200,20 300,10 C400,0 500,20 600,10 C700,0 750,15 800,10 L800,20 L0,20 Z"/>
+        <svg class="wave-top" viewBox="0 0 1600 20" preserveAspectRatio="none">
+          <path fill="${g.color}" d="M0,10 Q100,2 200,10 Q300,18 400,10 Q500,2 600,10 Q700,18 800,10 Q900,2 1000,10 Q1100,18 1200,10 Q1300,2 1400,10 Q1500,18 1600,10 L1600,20 L0,20 Z"/>
         </svg>
-        <svg class="wave-top2" viewBox="0 0 800 14" preserveAspectRatio="none">
-          <path fill="${g.color}" d="M0,7 C80,0 160,14 240,7 C320,0 400,14 480,7 C560,0 640,14 720,7 C760,3 780,11 800,7 L800,14 L0,14 Z"/>
+        <svg class="wave-top2" viewBox="0 0 1600 14" preserveAspectRatio="none">
+          <path fill="${g.color}" d="M0,7 Q80,1 160,7 Q240,13 320,7 Q400,1 480,7 Q560,13 640,7 Q720,1 800,7 Q880,13 960,7 Q1040,1 1120,7 Q1200,13 1280,7 Q1360,1 1440,7 Q1520,13 1600,7 L1600,14 L0,14 Z"/>
         </svg>
       </div>
       <div class="liq-pct" style="color:${txtCol}">${pct>=100?'🎉':pct.toFixed(1)+'%'}</div>
