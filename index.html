@@ -180,17 +180,7 @@ button,input,textarea{font-family:inherit;}
 .sc .lb{font-size:11px;color:var(--text2);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
 .sc .vl{font-size:16px;font-weight:800;letter-spacing:-.3px;}
 .vl.inc{color:var(--green);}.vl.exp{color:var(--red);}
-/* Trend badge */
-.trend{
-  display:inline-flex;
-  align-items:center;
-  gap:4px;
-  margin-top:4px;
-  padding:2px 8px;
-  border-radius:8px;
-  font-size:11px;
-  font-weight:700;
-}
+.trend{display:inline-flex;align-items:center;gap:4px;margin-top:4px;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;}
 .trend.up{background:rgba(34,212,126,.15);color:var(--green);}
 .trend.down{background:rgba(255,77,109,.15);color:var(--red);}
 .trend.neutral{background:var(--bg2);color:var(--text3);}
@@ -227,11 +217,10 @@ button,input,textarea{font-family:inherit;}
 
 .day-g{margin-bottom:12px;}
 .day-lb{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:8px 2px 6px;}
-.day-items{background:var(--bg1);border-radius:var(--r);border:1px solid rgba(255,255,255,.05);}
-.hi-wrapper:first-child .swipeable{border-radius:var(--r) var(--r) 0 0;}
-.hi-wrapper:last-child .swipeable{border-radius:0 0 var(--r) var(--r);}
-.hi-wrapper:first-child:last-child .swipeable{border-radius:var(--r);}
-.hi{display:flex;align-items:center;gap:12px;padding:13px 15px;}
+.day-items{background:var(--bg1);border-radius:var(--r);overflow:hidden;border:1px solid rgba(255,255,255,.05);}
+.hi{display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s;}
+.hi:last-child{border-bottom:none;}
+.hi:active{background:var(--bg2);}
 .hi-ico{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .hi-ico.expense{background:rgba(255,77,109,.1);}
 .hi-ico.income{background:rgba(34,212,126,.1);}
@@ -305,29 +294,9 @@ button,input,textarea{font-family:inherit;}
   font-size:21px;font-weight:900;letter-spacing:-.4px;z-index:4;
   text-shadow:0 1px 8px rgba(0,0,0,.5);
 }
-/* Milestone markers */
-.milestones{
-  position:absolute;inset:0;pointer-events:none;z-index:2;
-}
-.milestone{
-  position:absolute;
-  left:0;right:0;
-  height:1px;
-  background:rgba(255,255,255,.15);
-  display:flex;
-  align-items:center;
-  padding:0 8px;
-}
-.milestone::before{
-  content:attr(data-label);
-  font-size:9px;
-  font-weight:700;
-  color:rgba(255,255,255,.35);
-  background:var(--bg3);
-  padding:2px 6px;
-  border-radius:6px;
-  text-shadow:none;
-}
+.milestones{position:absolute;inset:0;pointer-events:none;z-index:2;}
+.milestone{position:absolute;left:0;right:0;height:1px;background:rgba(255,255,255,.15);display:flex;align-items:center;padding:0 8px;}
+.milestone::before{content:attr(data-label);font-size:9px;font-weight:700;color:rgba(255,255,255,.35);background:var(--bg3);padding:2px 6px;border-radius:6px;text-shadow:none;}
 .milestone.reached{background:rgba(255,255,255,.25);}
 .milestone.reached::before{color:rgba(255,255,255,.6);}
 
@@ -505,103 +474,29 @@ button,input,textarea{font-family:inherit;}
 .skeleton-text.w80{width:80%;}
 .skeleton-text.w40{width:40%;}
 
-/* ═══ TOAST NOTIFICATIONS ═══ */
-.toast{
-  position:fixed;
-  bottom:calc(var(--nav) + 20px);
-  left:50%;
-  transform:translateX(-50%) translateY(100px);
-  min-width:280px;
-  max-width:90%;
-  background:var(--bg1);
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:16px;
-  padding:14px 18px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  box-shadow:0 8px 32px rgba(0,0,0,.5);
-  z-index:999;
-  opacity:0;
-  transition:all .3s cubic-bezier(.34,1.2,.64,1);
-  pointer-events:none;
-}
-.toast.show{
-  transform:translateX(-50%) translateY(0);
-  opacity:1;
-}
-.toast-icon{
-  font-size:24px;
-  flex-shrink:0;
-}
-.toast-content{
-  flex:1;
-}
-.toast-title{
-  font-size:14px;
-  font-weight:700;
-  margin-bottom:2px;
-}
-.toast-message{
-  font-size:13px;
-  color:var(--text2);
-  font-weight:500;
-}
+/* ═══ SWIPE TO DELETE ═══ */
+.swipeable{position:relative;transition:transform .2s cubic-bezier(.4,0,.2,1);}
+.swipeable.swiping{transition:none;}
+.delete-bg{position:absolute;right:0;top:0;bottom:0;width:80px;background:var(--red);display:flex;align-items:center;justify-content:center;border-radius:var(--r);opacity:0;transition:opacity .2s;}
+.swipeable.show-delete .delete-bg{opacity:1;}
+.delete-bg svg{width:24px;height:24px;stroke:white;stroke-width:2;}
+
+/* ═══ PULL TO REFRESH ═══ */
+.pull-indicator{position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:40px;height:40px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;}
+.pull-indicator.show{opacity:1;}
+.pull-indicator svg{width:24px;height:24px;stroke:var(--accent);stroke-width:2;animation:spin 1s linear infinite;}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* ═══ TOAST ═══ */
+.toast{position:fixed;bottom:calc(var(--nav) + 20px);left:50%;transform:translateX(-50%) translateY(100px);min-width:280px;max-width:90%;background:var(--bg1);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:999;opacity:0;transition:all .3s cubic-bezier(.34,1.2,.64,1);pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.toast-icon{font-size:24px;flex-shrink:0;}
+.toast-content{flex:1;}
+.toast-title{font-size:14px;font-weight:700;margin-bottom:2px;}
+.toast-message{font-size:13px;color:var(--text2);font-weight:500;}
 .toast.success{border-left:3px solid var(--green);}
 .toast.error{border-left:3px solid var(--red);}
 .toast.info{border-left:3px solid var(--accent);}
-
-/* ═══ SWIPE ACTIONS ═══ */
-.swipe-container{position:relative;overflow:hidden;}
-.swipe-actions-left,
-.swipe-actions-left,
-.swipe-actions-right{
-  position:absolute;
-  top:0;
-  bottom:0;
-  width:70px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:1;
-  transition:transform .15s ease;
-}
-.swipe-actions-left{
-  left:0;
-  background:linear-gradient(90deg, rgba(124,109,255,.95), rgba(124,109,255,1));
-  box-shadow:inset -2px 0 8px rgba(0,0,0,.2);
-}
-.swipe-actions-right{
-  right:0;
-  background:linear-gradient(-90deg, rgba(255,77,109,.95), rgba(255,77,109,1));
-  box-shadow:inset 2px 0 8px rgba(0,0,0,.2);
-}
-.swipe-action-icon{
-  width:26px;
-  height:26px;
-  stroke:white;
-  stroke-width:2.5;
-  fill:none;
-  filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));
-  transition:transform .2s cubic-bezier(.34,1.56,.64,1);
-}
-.swipe-actions-left:active .swipe-action-icon,
-.swipe-actions-right:active .swipe-action-icon{
-  transform:scale(1.2);
-}
-.hi-wrapper{
-  position:relative;
-  border-bottom:1px solid rgba(255,255,255,.04);
-  overflow:hidden;
-}
-.hi-wrapper:last-child{border-bottom:none;}
-.swipeable{
-  position:relative;
-  z-index:2;
-  background:var(--bg1);
-  transition:transform .25s cubic-bezier(.4,0,.2,1);
-}
-.swipeable.swiping{transition:none;}
 
 /* ═══ KEYFRAMES ═══ */
 @keyframes mpop{from{opacity:0;transform:scale(.88) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
@@ -680,11 +575,7 @@ button,input,textarea{font-family:inherit;}
   <div class="screen" id="s-history">
     <div class="ph" style="display:flex;align-items:center;justify-content:space-between;">
       <div><h1>История</h1></div>
-      <button onclick="openM('mRecurring')" style="width:44px;height:44px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--accent),var(--a2));display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 2px 8px rgba(124,109,255,.3);transition:transform .12s;-webkit-tap-highlight-color:transparent;" onmousedown="this.style.transform='scale(.88)'" onmouseup="this.style.transform='scale(1)'">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" style="width:20px;height:20px;stroke-width:2.5;">
-          <path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/>
-        </svg>
-      </button>
+      <button onclick="openM('mRecurring')" style="width:44px;height:44px;border-radius:14px;border:none;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;flex-shrink:0;">🔄</button>
     </div>
     <!-- Search bar -->
     <div style="padding:0 16px;flex-shrink:0;margin-bottom:8px;">
@@ -867,7 +758,7 @@ button,input,textarea{font-family:inherit;}
   </div>
 </div>
 
-<!-- Toast Container -->
+<!-- Toast -->
 <div class="toast" id="toast">
   <div class="toast-icon" id="toastIcon">✓</div>
   <div class="toast-content">
@@ -898,45 +789,25 @@ button,input,textarea{font-family:inherit;}
   window.visualViewport.addEventListener('scroll', onResize);
 })();
 
-/* ── TOAST NOTIFICATIONS ── */
+/* ── TOAST ── */
 let toastTimer = null;
 function showToast(title, message, type = 'success') {
   const toast = document.getElementById('toast');
   const icon = document.getElementById('toastIcon');
   const titleEl = document.getElementById('toastTitle');
   const messageEl = document.getElementById('toastMessage');
-
-  // Icons
-  const icons = {
-    success: '✓',
-    error: '✕',
-    info: 'ℹ',
-    warning: '⚠'
-  };
-
+  const icons = {success: '✓', error: '✕', info: 'ℹ', warning: '⚠'};
   icon.textContent = icons[type] || icons.success;
   titleEl.textContent = title;
   messageEl.textContent = message;
-
-  // Remove old classes
   toast.classList.remove('success', 'error', 'info', 'warning');
   toast.classList.add(type);
-
-  // Show
   clearTimeout(toastTimer);
   toast.classList.add('show');
-
-  // Haptic feedback
   if(window.Telegram?.WebApp?.HapticFeedback) {
-    window.Telegram.WebApp.HapticFeedback.notificationOccurred(
-      type === 'success' ? 'success' : type === 'error' ? 'error' : 'warning'
-    );
+    window.Telegram.WebApp.HapticFeedback.notificationOccurred(type === 'success' ? 'success' : type === 'error' ? 'error' : 'warning');
   }
-
-  // Hide after 3s
-  toastTimer = setTimeout(() => {
-    toast.classList.remove('show');
-  }, 3000);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
 function formatNumInput(input){
@@ -1271,8 +1142,14 @@ function renderStats(){
   const mt=txs.filter(t=>new Date(t.date)>=ms);
   const inc=mt.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
   const exp=mt.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  document.getElementById('si').textContent=fmt(inc);
+  document.getElementById('se').textContent=fmt(exp);
+  const bl=document.getElementById('sb');
+  const bal=inc-exp;
+  bl.textContent=(bal>=0?'+':'')+fmt(bal);
+  bl.style.color=bal>=0?'var(--green)':'var(--red)';
   
-  // Calculate previous month for trends
+  // Calculate previous month trends
   const prevMonthStart = new Date(ms);
   prevMonthStart.setMonth(prevMonthStart.getMonth() - 1);
   const prevMonthEnd = new Date(ms);
@@ -1284,45 +1161,24 @@ function renderStats(){
   const prevInc = prevTxs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
   const prevExp = prevTxs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
   
-  // Calculate trends
   function getTrend(current, previous) {
     if(!previous) return {type: 'neutral', text: 'Нет данных'};
     const change = ((current - previous) / previous * 100).toFixed(0);
     if(Math.abs(change) < 5) return {type: 'neutral', text: '≈ 0%'};
-    return {
-      type: change > 0 ? 'up' : 'down',
-      text: `${change > 0 ? '↗' : '↘'} ${Math.abs(change)}%`
-    };
+    return {type: change > 0 ? 'up' : 'down', text: `${change > 0 ? '↗' : '↘'} ${Math.abs(change)}%`};
   }
   
   const incTrend = getTrend(inc, prevInc);
   const expTrend = getTrend(exp, prevExp);
-  const balTrend = getTrend(inc-exp, prevInc-prevExp);
+  const balTrend = getTrend(bal, prevInc-prevExp);
   
-  document.getElementById('si').textContent=fmt(inc);
-  document.getElementById('se').textContent=fmt(exp);
-  const bl=document.getElementById('sb');
-  const bal=inc-exp;
-  bl.textContent=(bal>=0?'+':'')+fmt(bal);
-  bl.style.color=bal>=0?'var(--green)':'var(--red)';
+  document.getElementById('si').parentElement.querySelectorAll('.trend').forEach(el => el.remove());
+  document.getElementById('se').parentElement.querySelectorAll('.trend').forEach(el => el.remove());
+  bl.parentElement.querySelectorAll('.trend').forEach(el => el.remove());
   
-  // Add trends
-  const siCard = document.getElementById('si').parentElement;
-  const seCard = document.getElementById('se').parentElement;
-  const sbCard = bl.parentElement;
-  
-  // Remove old trends
-  siCard.querySelectorAll('.trend').forEach(el => el.remove());
-  seCard.querySelectorAll('.trend').forEach(el => el.remove());
-  sbCard.querySelectorAll('.trend').forEach(el => el.remove());
-  
-  // Add new trends
-  document.getElementById('si').insertAdjacentHTML('afterend', 
-    `<div class="trend ${incTrend.type}">${incTrend.text}</div>`);
-  document.getElementById('se').insertAdjacentHTML('afterend', 
-    `<div class="trend ${expTrend.type}">${expTrend.text}</div>`);
-  bl.insertAdjacentHTML('afterend', 
-    `<div class="trend ${balTrend.type}">${balTrend.text}</div>`);
+  document.getElementById('si').insertAdjacentHTML('afterend', `<div class="trend ${incTrend.type}">${incTrend.text}</div>`);
+  document.getElementById('se').insertAdjacentHTML('afterend', `<div class="trend ${expTrend.type}">${expTrend.text}</div>`);
+  bl.insertAdjacentHTML('afterend', `<div class="trend ${balTrend.type}">${balTrend.text}</div>`);
   
   const mn=new Date().toLocaleDateString('ru',{month:'long',year:'numeric'});
   document.getElementById('statsMonth').textContent=mn.charAt(0).toUpperCase()+mn.slice(1);
@@ -1339,20 +1195,6 @@ function renderStats(){
   if(cats.length)dI=new Chart(document.getElementById('donutChart'),{type:'doughnut',data:{labels:cats.map(c=>c[0]),datasets:[{data:cats.map(c=>c[1]),backgroundColor:PAL,borderWidth:0,hoverOffset:10}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false}}}});
   document.getElementById('catList').innerHTML=cats.map((c,i)=>`<div class="cr"><div class="cdot" style="background:${PAL[i%PAL.length]}"></div><div class="cn">${ICONS[c[0]]||'•'} ${c[0]}</div><div class="ct"><div class="cf" style="width:0%;background:${PAL[i%PAL.length]}" data-w="${(c[1]/mx*100).toFixed(0)}"></div></div><div class="ca">${fmt(c[1])}</div></div>`).join('');
   setTimeout(()=>document.querySelectorAll('.cf').forEach(el=>{el.style.width=el.dataset.w+'%';}),60);
-  
-  // Streak display - only if > 0
-  if(achievements && achievements.streak > 0){
-    const statsCont = document.querySelector('#s-stats .scr > div');
-    let streakEl = statsCont.querySelector('.streak-card');
-    if(!streakEl){
-      streakEl = document.createElement('div');
-      streakEl.className = 'streak-card';
-      streakEl.style.cssText = 'text-align:center;margin-bottom:16px;padding:16px;background:var(--bg2);border-radius:14px;';
-      statsCont.insertBefore(streakEl, statsCont.firstChild);
-    }
-    const days = achievements.streak === 1 ? 'день' : achievements.streak < 5 ? 'дня' : 'дней';
-    streakEl.innerHTML = `<div style="font-size:40px;margin-bottom:6px;">🔥</div><div style="font-size:20px;font-weight:800;letter-spacing:-.4px;">${achievements.streak} ${days} подряд</div><div style="font-size:13px;color:var(--text2);margin-top:4px;">Ты молодец!</div>`;
-  }
 }
 
 /* ── HISTORY ── */
@@ -1379,7 +1221,7 @@ function renderHistory(){
   }
   const g={};
   data.forEach(t=>{const k=new Date(t.date).toLocaleDateString('ru',{day:'numeric',month:'long'});if(!g[k])g[k]=[];g[k].push(t);});
-  el.innerHTML=Object.entries(g).map(([d,ts])=>`<div class="day-g"><div class="day-lb">${d}</div><div class="day-items">${ts.map(t=>`<div class="hi"><div class="hi-ico ${t.type}">${ICONS[t.category]||'💰'}</div><div class="hi-info"><div class="hi-d">${t.description}</div><div class="hi-c">${t.category}</div></div><div class="hi-a ${t.type}">${t.type==='income'?'+':'-'}${t.amount.toLocaleString('ru')} ₽</div></div>`).join('')}</div></div>`).join('');
+  el.innerHTML=Object.entries(g).map(([d,ts])=>`<div class="day-g"><div class="day-lb">${d}</div><div class="day-items">${ts.map(t=>`<div class="hi" data-txid="${t.id}" style="cursor:pointer;" onclick="openEditTx(${t.id})"><div class="hi-ico ${t.type}">${ICONS[t.category]||'💰'}</div><div class="hi-info"><div class="hi-d">${t.description}</div><div class="hi-c">${t.category}</div></div><div class="hi-a ${t.type}">${t.type==='income'?'+':'-'}${t.amount.toLocaleString('ru')} ₽</div></div>`).join('')}</div></div>`).join('');
 }
 
 /* ══════════════════════════
@@ -1430,6 +1272,11 @@ function goalHTML(g){
         <svg class="wave-top2" viewBox="0 0 800 14" preserveAspectRatio="none">
           <path fill="${g.color}" d="M0,7 C80,0 160,14 240,7 C320,0 400,14 480,7 C560,0 640,14 720,7 C760,3 780,11 800,7 L800,14 L0,14 Z"/>
         </svg>
+      </div>
+      <div class="milestones">
+        <div class="milestone ${pct>=25?'reached':''}" style="bottom:25%;" data-label="25%"></div>
+        <div class="milestone ${pct>=50?'reached':''}" style="bottom:50%;" data-label="50%"></div>
+        <div class="milestone ${pct>=75?'reached':''}" style="bottom:75%;" data-label="75%"></div>
       </div>
       <div class="liq-pct" style="color:${txtCol}">${pct>=100?'🎉':pct.toFixed(1)+'%'}</div>
     </div>
@@ -1735,8 +1582,8 @@ document.getElementById('saveTxBtn').addEventListener('click', ()=>{
   tx.category = document.getElementById('editTxCat').value;
   save();
   renderHistory();
-  closeM('mEditTx');
   showToast('Сохранено', 'Транзакция обновлена', 'success');
+  closeM('mEditTx');
   editingTxId = null;
 });
 
@@ -1907,11 +1754,7 @@ renderHistory = function(){
   
   const el = document.getElementById('histEl');
   if(!filtered.length){
-    el.innerHTML=`<div class="empty">
-      <div class="ei">💸</div>
-      <p style="font-size:17px;font-weight:700;margin-bottom:4px;color:var(--text);">Пока пусто</p>
-      <p>Начни вести учёт финансов<br>Просто напиши в чат сумму и описание</p>
-    </div>`;
+    el.innerHTML='<div class="empty"><div class="ei">📭</div><p>Нет транзакций</p></div>';
     return;
   }
   
@@ -1934,145 +1777,19 @@ renderHistory = function(){
       <div class="day-items">${items.map(t=>{
         const ico = ICONS[t.category]||'💰';
         const amt = t.type==='income'?'+':'−';
-        return `<div class="hi-wrapper" data-txid="${t.id}">
-          <div class="swipe-actions-left">
-            <svg class="swipe-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        return `<div class="hi swipeable" data-txid="${t.id}">
+          <div class="delete-bg"><svg viewBox="0 0 24 24" fill="none"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></div>
+          <div class="hi-ico ${t.type}">${ico}</div>
+          <div class="hi-info">
+            <div class="hi-d">${t.description}</div>
+            <div class="hi-c">${t.category}</div>
           </div>
-          <div class="swipe-actions-right">
-            <svg class="swipe-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-          </div>
-          <div class="hi swipeable">
-            <div class="hi-ico ${t.type}">${ico}</div>
-            <div class="hi-info">
-              <div class="hi-d">${t.description}</div>
-              <div class="hi-c">${t.category}</div>
-            </div>
-            <div class="hi-a ${t.type}">${amt}${t.amount.toLocaleString('ru')} ₽</div>
-          </div>
+          <div class="hi-a ${t.type}">${amt}${t.amount.toLocaleString('ru')} ₽</div>
         </div>`;
       }).join('')}</div>
     </div>`;
   }).join('');
 };
-
-/* ── SWIPE ACTIONS ── */
-(function() {
-  let startX = 0;
-  let startY = 0;
-  let currentX = 0;
-  let swipeEl = null;
-  let wrapper = null;
-  let isSwiping = false;
-  let hasStartedSwipe = false;
-  let actionExecuted = false;
-
-  const histEl = document.getElementById('histEl');
-  const SWIPE_THRESHOLD = 70; // Distance needed to trigger action
-  const SWIPE_START_THRESHOLD = 15; // Distance to start swipe
-
-  histEl.addEventListener('touchstart', e => {
-    const target = e.target.closest('.hi-wrapper');
-    if(!target) return;
-    
-    wrapper = target;
-    swipeEl = wrapper.querySelector('.swipeable');
-    if(!swipeEl) return;
-    
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-    currentX = startX;
-    hasStartedSwipe = false;
-    isSwiping = false;
-    actionExecuted = false;
-  }, {passive: true});
-
-  histEl.addEventListener('touchmove', e => {
-    if(!swipeEl || actionExecuted) return;
-    
-    currentX = e.touches[0].clientX;
-    const diffX = currentX - startX;
-    const diffY = e.touches[0].clientY - startY;
-    
-    // Start swiping only if horizontal movement is significant
-    if(!hasStartedSwipe && Math.abs(diffX) > SWIPE_START_THRESHOLD && Math.abs(diffX) > Math.abs(diffY)) {
-      hasStartedSwipe = true;
-      isSwiping = true;
-      swipeEl.classList.add('swiping');
-    }
-    
-    if(!isSwiping) return;
-    
-    // Limit swipe distance
-    const maxSwipe = 100;
-    const clampedDiff = Math.max(-maxSwipe, Math.min(maxSwipe, diffX));
-    swipeEl.style.transform = `translateX(${clampedDiff}px)`;
-    
-    // Execute action when threshold reached
-    if(!actionExecuted) {
-      if(diffX < -SWIPE_THRESHOLD) {
-        // Delete action
-        actionExecuted = true;
-        executeDelete();
-      } else if(diffX > SWIPE_THRESHOLD) {
-        // Edit action
-        actionExecuted = true;
-        executeEdit();
-      }
-    }
-  }, {passive: true});
-
-  histEl.addEventListener('touchend', e => {
-    if(!swipeEl || !wrapper) return;
-    
-    if(swipeEl) swipeEl.classList.remove('swiping');
-    
-    // If action wasn't executed, reset position
-    if(!actionExecuted) {
-      swipeEl.style.transition = 'transform .2s cubic-bezier(.4,0,.2,1)';
-      swipeEl.style.transform = '';
-      setTimeout(() => { if(swipeEl) swipeEl.style.transition = ''; }, 200);
-    }
-    
-    isSwiping = false;
-    hasStartedSwipe = false;
-    swipeEl = null;
-    wrapper = null;
-  });
-
-  function executeDelete() {
-    if(!wrapper || !swipeEl) return;
-    const txId = +wrapper.dataset.txid;
-    
-    if(tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-    
-    // Animate out
-    swipeEl.style.transition = 'transform .3s cubic-bezier(.4,0,.2,1), opacity .3s';
-    swipeEl.style.transform = 'translateX(-100%)';
-    swipeEl.style.opacity = '0';
-    
-    setTimeout(() => {
-      txs = txs.filter(t => t.id !== txId);
-      save();
-      renderHistory();
-    }, 300);
-  }
-
-  function executeEdit() {
-    if(!wrapper || !swipeEl) return;
-    const txId = +wrapper.dataset.txid;
-    
-    if(tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
-    
-    // Animate back
-    swipeEl.style.transition = 'transform .2s cubic-bezier(.4,0,.2,1)';
-    swipeEl.style.transform = '';
-    
-    setTimeout(() => {
-      openEditTx(txId);
-      if(swipeEl) swipeEl.style.transition = '';
-    }, 200);
-  }
-})();
 
 // Haptic feedback for buttons
 if(tg?.HapticFeedback){
@@ -2080,6 +1797,36 @@ if(tg?.HapticFeedback){
     btn.addEventListener('click', ()=> tg.HapticFeedback.impactOccurred('light'));
   });
 }
+
+// Long-press to delete transaction
+let longPressTimer = null;
+document.getElementById('histEl').addEventListener('touchstart', function(e) {
+  const hi = e.target.closest('.hi');
+  if(!hi) return;
+  const txId = +hi.dataset.txid;
+  if(!txId) return;
+  
+  longPressTimer = setTimeout(() => {
+    if(window.Telegram?.WebApp?.HapticFeedback) {
+      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+    }
+    if(confirm('Удалить эту транзакцию?')) {
+      txs = txs.filter(t => t.id !== txId);
+      save();
+      renderHistory();
+      showToast('Удалено', 'Транзакция удалена', 'info');
+    }
+  }, 500);
+}, {passive: true});
+
+document.getElementById('histEl').addEventListener('touchend', function() {
+  clearTimeout(longPressTimer);
+});
+
+document.getElementById('histEl').addEventListener('touchmove', function() {
+  clearTimeout(longPressTimer);
+});
+
 </script>
 </body>
 </html>
